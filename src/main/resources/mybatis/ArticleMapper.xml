@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.mapper.ArticleMapper">
 
+    <sql id="Base_Column_List">
+        id,uid,pic,title,content,created_at
+    </sql>
+
     <select id="select" resultType="com.example.demo.bean.Article">
         select * from article order by id desc;
     </select>
@@ -16,7 +20,7 @@
         ,#{pic}
         ,#{title}
         ,#{content}
-        ,#{created_at}
+        ,#{createdAt}
         );
     </insert>
 
@@ -39,5 +43,24 @@
     <delete id="del">
         delete from article where id = #{id};
     </delete>
+
+    <select id="queryByConditionCount" resultType="int">
+        select count(*) as total from article
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="title != null">
+                and title like "%"#{title}"%"
+            </if>
+        </trim>
+    </select>
+
+    <select id="queryByConditionResult" resultType="com.example.demo.bean.Article">
+        select <include refid="Base_Column_List"/> from article
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="title != null">
+                and title like "%"#{title}"%"
+            </if>
+        </trim>
+        limit #{startRow},#{limit}
+    </select>
 
 </mapper>

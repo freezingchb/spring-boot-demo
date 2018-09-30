@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.bean.Article;
 import com.example.demo.mapper.ArticleMapper;
+import com.example.demo.page.ArticlePage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,14 @@ public class ArticleService {
 
     public int del(int id) {
         return articleMapper.del(id);
+    }
+
+    public ArticlePage queryByCondition(ArticlePage articlePage) {
+        int total = articleMapper.queryByConditionCount(articlePage);
+        if (total > 0) {
+            articlePage.setDatas(articleMapper.queryByConditionResult(articlePage));
+        }
+        articlePage.setTotal(total);
+        return articlePage;
     }
 }

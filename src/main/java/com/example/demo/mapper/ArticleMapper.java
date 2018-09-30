@@ -1,6 +1,7 @@
 package com.example.demo.mapper;
 
 import com.example.demo.bean.Article;
+import com.example.demo.page.ArticlePage;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +17,8 @@ public interface ArticleMapper {
     public int update(Article article);
 
     public Integer del(int id);
+
+    public int queryByConditionCount(ArticlePage articlePage);
+
+    public List<Article> queryByConditionResult(ArticlePage articlePage);
 }

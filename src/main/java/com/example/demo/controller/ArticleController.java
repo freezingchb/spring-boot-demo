@@ -2,7 +2,10 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.example.demo.bean.Article;
+import com.example.demo.page.ArticlePage;
+import com.example.demo.page.PageInfo;
 import com.example.demo.service.ArticleService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +22,35 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
+    @ResponseBody
+    @RequestMapping(value = "/all")
+    public String all() {
+        System.out.println(articleService.find(1));
+        List<Article> list = articleService.select();
+        return JSON.toJSONString(list);
+    }
+
     @RequestMapping(value = "/index")
-    public ModelAndView index() {
-        List<Article> articles = articleService.select();
+    public ModelAndView index(String title, Integer page, Integer pageSize) {
+        ArticlePage articlePage = new ArticlePage();
+        if (StringUtils.isNotBlank(title))
+            articlePage.setTitle(title);
+        if (page != null)
+            articlePage.setCurrPageNo(page);
+        if (pageSize != null)
+            articlePage.setLimit(pageSize);
+        articlePage = articleService.queryByCondition(articlePage);
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setTotal(articlePage.getTotal());
+        pageInfo.setLastPage(articlePage.getPageNos());
+        pageInfo.setPage(articlePage.getCurrentPage());
+        pageInfo.setPageSize(articlePage.getLimit());
+        pageInfo.setPageNumbers(articlePage.getNavigatePageNos());
+
         ModelAndView mv = new ModelAndView("article-index");
-        mv.addObject("articles", articles);
+        mv.addObject("articles", articlePage.getDatas());
+        mv.addObject("pageInfo", pageInfo);
         return mv;
     }
 

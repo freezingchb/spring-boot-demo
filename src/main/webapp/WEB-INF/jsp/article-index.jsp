@@ -3,6 +3,9 @@
 <html>
 <head>
     <title>Title</title>
+    <style>
+        ul li{list-style: none;float: left;margin-left: 8px}
+    </style>
 </head>
 <body>
 <div>
@@ -37,5 +40,25 @@
             </tr>
         </c:forEach>
     </table>
+<div>
+    <ul>
+        <c:if test="${pageInfo.lastPage > 1}">
+            <li><a href="/article/index?pageSize=${pageInfo.pageSize}&page=1">首页</a></li>
+            <c:forEach items="${pageInfo.pageNumbers}" var="p">
+                <li>
+                    <c:choose>
+                        <c:when test="${p == pageInfo.page}">
+                            <span>${p}</span>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="/article/index?pageSize=${pageInfo.pageSize}&page=${p}">${p}</a>
+                        </c:otherwise>
+                    </c:choose>
+                </li>
+            </c:forEach>
+            <li><a href="/article/index?pageSize=${pageInfo.pageSize}&page=${pageInfo.lastPage}">尾页</a></li>
+        </c:if>
+    </ul>
+</div>
 </body>
 </html>
