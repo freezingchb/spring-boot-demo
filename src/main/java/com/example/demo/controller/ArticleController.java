@@ -7,11 +7,15 @@ import com.example.demo.page.PageInfo;
 import com.example.demo.service.ArticleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -22,10 +26,12 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
+    @Value("${demo.upload.path}")
+    private String uploadFilePath;
+
     @ResponseBody
     @RequestMapping(value = "/all")
     public String all() {
-        System.out.println(articleService.find(1));
         List<Article> list = articleService.select();
         return JSON.toJSONString(list);
     }
@@ -59,19 +65,19 @@ public class ArticleController {
         return "article-add";
     }
 
-    @ResponseBody
     @RequestMapping(value = "/addData")
-    public String addData(Article article) {
-        article.setUid(1);
-        article.setPic("https://www.baidu.com/img/baidu_jgylogo3.gif");
-        article.setCreated_at(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        Integer num = articleService.insert(article);
-        System.out.println(num);
+    public String addData(Article article, MultipartFile picture) throws Exception {
+        // 文件上传
+        if (picture != null && StringUtils.isNotBlank(picture.getOriginalFilename())) {
+            File originFile = new File(uploadFilePath + picture.getOriginalFilename());
+            FileCopyUtils.copy(picture.getBytes(), originFile);
+            article.setPic("http://127.0.0.1/A/upload/" + picture.getOriginalFilename());
+        }
 
-        Map map = new HashMap();
-        map.put("status", 1);
-        map.put("info", "保存成功");
-        return JSON.toJSONString(map);
+        article.setUid(1);
+        article.setCreated_at(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        articleService.insert(article);
+        return "redirect:/article/index";
     }
 
     @RequestMapping(value = "/edit")
@@ -83,10 +89,13 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/editData")
-    public String editData(Article article) {
-        System.out.println(article);
+    public String editData(Article article, MultipartFile picture) throws Exception {
+        if (picture != null && StringUtils.isNotBlank(picture.getOriginalFilename())) {
+            File originFile = new File(uploadFilePath + picture.getOriginalFilename());
+            FileCopyUtils.copy(picture.getBytes(), originFile);
+            article.setPic("http://127.0.0.1/A/upload/" + picture.getOriginalFilename());
+        }
         int res = articleService.update(article);
-        System.out.println(res);
         return "redirect:/article/index";
     }
 

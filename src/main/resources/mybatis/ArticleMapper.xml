@@ -20,7 +20,7 @@
         ,#{pic}
         ,#{title}
         ,#{content}
-        ,#{createdAt}
+        ,#{created_at}
         );
     </insert>
 
