@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.example.demo.bean.Article;
+import com.example.demo.common.BCrypt;
 import com.example.demo.page.ArticlePage;
 import com.example.demo.page.PageInfo;
 import com.example.demo.service.ArticleService;
@@ -31,7 +32,13 @@ public class ArticleController {
 
     @ResponseBody
     @RequestMapping(value = "/all")
-    public String all() {
+    public String all() throws Exception {
+        // hash验证密码
+        if (BCrypt.checkpw("201255", "$2y$10$/hJ7bituKWW7/4nbIzByfOiimFoJm1OMuscWSQVSnwpAO/eMyWckG"))
+            System.out.println("It matches");
+        else
+            System.out.println("It does not match");
+
         List<Article> list = articleService.select();
         return JSON.toJSONString(list);
     }
